@@ -5,17 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101010">
 <title>Soma AI — 0.1</title>
-<!-- Supabase JS Client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* CSS Variables for Light/Dark Theme */
 :root{
   color-scheme:dark;
   --bg:#101010;--surface:#171717;--surface2:#202020;--surface3:#292929;
   --text:#f5f5f5;--muted:#a1a1aa;--subtle:#777;
   --line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.15);
   --blue:#3987ff;--blue-hover:#2674ed;--blue-soft:rgba(57,135,255,.13);--blue-light:#7eb3ff;
-  --danger:#f87171;
   --shadow:0 22px 70px rgba(0,0,0,.42);
   --sidebar:280px;
   --user-bubble:#2a2a2a;
@@ -27,7 +24,6 @@ body.light{
   --text:#1a1a1a;--muted:#6b6b73;--subtle:#888;
   --line:rgba(0,0,0,.09);--line2:rgba(0,0,0,.15);
   --blue:#2677ee;--blue-hover:#1765d5;--blue-soft:rgba(38,119,238,.10);--blue-light:#2677ee;
-  --danger:#dc2626;
   --shadow:0 22px 70px rgba(0,0,0,.18);
   --user-bubble:#2677ee;
   --user-bubble-text:#ffffff;
@@ -114,7 +110,7 @@ body.ar .ai-line{margin-right:0;margin-left:14px}
 .send-btn.ready:hover{background:var(--blue-hover)}
 .send-btn svg{width:19px;height:19px}
 
-/* Modals (Settings, Profile, Auth) */
+/* Full Page Modals */
 .fullpage{position:fixed;inset:0;background:var(--bg);z-index:60;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease}
 body.ar .fullpage{transform:translateX(-100%)}
 .fullpage.open{transform:translateX(0)}
@@ -163,7 +159,7 @@ body.ar .fullpage{transform:translateX(-100%)}
 .auth-btn:hover{background:var(--blue-hover)}
 .auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--muted)}
 .auth-switch span{color:var(--blue);cursor:pointer}
-.auth-error{color:var(--danger);font-size:12px;text-align:center;margin-bottom:10px;min-height:16px}
+.auth-error{color:#f87171;font-size:12px;text-align:center;margin-bottom:10px;min-height:16px}
 
 /* Mobile */
 @media(max-width:760px){
@@ -264,8 +260,7 @@ body.ar .fullpage{transform:translateX(-100%)}
 <section class="fullpage" id="settingsPage">
   <div class="fp-head">
     <button class="fp-back" data-close-page="settingsPage"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="fp-title">Settings</div>
-    <span class="spacer"></span>
+    <div class="fp-title">Settings</div><span class="spacer"></span>
   </div>
   <div class="fp-body">
     <div class="fp-section">
@@ -340,13 +335,25 @@ body.ar .fullpage{transform:translateX(-100%)}
   </div>
 </section>
 
+<!-- Profile Page -->
+<section class="fullpage" id="profilePage">
+  <div class="fp-head">
+    <button class="fp-back" data-close-page="profilePage"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="fp-title">Profile</div><span class="spacer"></span>
+  </div>
+  <div class="fp-body" style="display:flex;flex-direction:column;align-items:center;padding-top:40px;">
+    <div style="width:88px;height:88px;border-radius:50%;background:var(--blue-soft);color:var(--blue);font-size:32px;font-weight:700;display:grid;place-items:center;margin-bottom:16px;" id="profileBigAvatar">G</div>
+    <div style="font-size:20px;font-weight:600;" id="profileBigName">Guest</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:4px;" id="profileBigEmail">not signed in</div>
+  </div>
+</section>
+
 <script>
 // ==========================================
-// 1. CONFIGURATION & INITIALIZATION
+// 1. CONFIGURATION
 // ==========================================
 const SUPABASE_URL = "https://xrhqfnvhktupekxffzuv.supabase.co";
 const SUPABASE_KEY = "sb_publishable_lGcUO42DonOuwGMOWIZGgA_WXIjr95-";
-// تم وضع رابط Railway الخاص بك هنا
 const RAILWAY_URL = "https://soma-ai-backend-production-4457.up.railway.app"; 
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -357,19 +364,18 @@ let currentUser = null;
 let chats = [];
 let currentChatId = null;
 let generating = false;
-
-// ==========================================
-// 2. TRANSLATIONS & UI
-// ==========================================
-const I18N = {
-  en: { newChat: "New chat", recents: "Recents", hello: "Hello, how can I help you?", hint: "Ask anything, and I'll do my best to help." },
-  ar: { newChat: "محادثة جديدة", recents: "الأخيرة", hello: "مرحبًا، كيف يمكنني مساعدتك؟", hint: "اسأل عن أي شيء، وسأبذل قصارى جهدي للمساعدة." },
-  so: { newChat: "Sheeko cusub", recents: "Kuwii u dambeeyay", hello: "Salaan, sideen kuu caawin karaa?", hint: "Wax walba weydii, waanan ku caawin doonaa." }
-};
-
 let currentLang = localStorage.getItem('soma_lang') || 'en';
 let currentAiLang = localStorage.getItem('soma_ailang') || 'en';
 let currentTheme = localStorage.getItem('soma_theme') || 'dark';
+
+// ==========================================
+// 2. TRANSLATIONS & UI LOGIC
+// ==========================================
+const I18N = {
+  en: { newChat: "New chat", recents: "Recents", hello: "Hello, how can I help you today?", hint: "Ask anything, and I'll do my best to help." },
+  ar: { newChat: "محادثة جديدة", recents: "الأخيرة", hello: "مرحبًا، كيف يمكنني مساعدتك اليوم؟", hint: "اسأل عن أي شيء، وسأبذل قصارى جهدي للمساعدة." },
+  so: { newChat: "Sheeko cusub", recents: "Kuwii u dambeeyay", hello: "Salaan, maanta sideen kuu caawin karaa?", hint: "Wax walba weydii, waanan ku caawin doonaa." }
+};
 
 function applyLang() {
   document.documentElement.lang = currentLang;
@@ -398,8 +404,36 @@ function applyTheme() {
   localStorage.setItem('soma_theme', currentTheme);
 }
 
+// Navigation
+function openPage(id) { document.getElementById(id).classList.add('open'); }
+function closePage(id) { document.getElementById(id).classList.remove('open'); }
+
+document.addEventListener('click', (e) => {
+  const openBtn = e.target.closest('[data-open-page]');
+  if (openBtn) openPage(openBtn.dataset.openPage);
+  const closeBtn = e.target.closest('[data-close-page]');
+  if (closeBtn) closePage(closeBtn.dataset.closePage);
+});
+
+$('#openSettings').onclick = () => openPage('settingsPage');
+
+$$('#themeChoices .choice').forEach(c => {
+  c.onclick = () => { currentTheme = c.dataset.theme; applyTheme(); };
+});
+$$('#uiLangChoices .choice').forEach(c => {
+  c.onclick = () => { currentLang = c.dataset.lang; applyLang(); };
+});
+$$('#aiLangChoices .choice').forEach(c => {
+  c.onclick = () => { currentAiLang = c.dataset.ailang; applyLang(); };
+});
+
+// Sidebar Mobile Toggle
+$('#sidebarToggle').onclick = () => { $('#sidebar').classList.toggle('mobile-open'); };
+$('#topMenu').onclick = () => { $('#sidebar').classList.toggle('mobile-open'); };
+$('#sidebarShade').onclick = () => { $('#sidebar').classList.remove('mobile-open'); };
+
 // ==========================================
-// 3. AUTHENTICATION
+// 3. AUTHENTICATION (SUPABASE)
 // ==========================================
 let isSignUp = false;
 $('#loginBtnTop').onclick = () => { $('#authModal').classList.add('open'); };
@@ -454,9 +488,15 @@ supabase.auth.onAuthStateChange((event, session) => {
     currentUser = session.user;
     $('#loginBtnTop').style.display = 'none';
     $('#openProfile').style.display = 'flex';
-    // Set profile avatar initial
+    
     const name = currentUser.user_metadata?.full_name || currentUser.email;
     $('#sidebarProfileInitial').textContent = name.charAt(0).toUpperCase();
+    
+    // Profile page data
+    $('#profileBigAvatar').textContent = name.charAt(0).toUpperCase();
+    $('#profileBigName').textContent = name;
+    $('#profileBigEmail').textContent = currentUser.email;
+
     fetchChats();
   } else {
     currentUser = null;
@@ -468,8 +508,10 @@ supabase.auth.onAuthStateChange((event, session) => {
   }
 });
 
+$('#openProfile').onclick = () => openPage('profilePage');
+
 // ==========================================
-// 4. DATABASE & CHAT LOGIC
+// 4. DATABASE & HISTORY
 // ==========================================
 async function fetchChats() {
   if (!currentUser) return;
@@ -511,6 +553,8 @@ function loadChat(chat) {
   const sorted = [...chat.messages].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
   sorted.forEach(m => appendMessage(m.role, m.content, m.rating));
   msgBox.scrollTop = msgBox.scrollHeight;
+  
+  if(window.innerWidth <= 760) $('#sidebar').classList.remove('mobile-open');
 }
 
 function newChat() {
@@ -520,24 +564,32 @@ function newChat() {
   $('#messages').innerHTML = '';
   $('#welcome').hidden = false;
   $('#prompt').value = '';
+  if(window.innerWidth <= 760) $('#sidebar').classList.remove('mobile-open');
 }
+$('#newChatBtn').onclick = newChat;
 
-function appendMessage(role, text, rating = null) {
+// ==========================================
+// 5. MESSAGES UI
+// ==========================================
+function appendMessage(role, text, rating = null, msgId = null) {
   const msgBox = $('#messages');
   const row = document.createElement('article');
   row.className = 'message ' + role;
+  if (msgId) row.dataset.id = msgId;
+  
+  const safeText = text.replace(/</g, "&lt;");
   
   if (role === 'user') {
-    row.innerHTML = `<div class="user-bubble-wrap"><div class="bubble">${text.replace(/</g, "&lt;")}</div></div>`;
+    row.innerHTML = `<div class="user-bubble-wrap"><div class="bubble">${safeText}</div></div>`;
   } else {
     row.innerHTML = `
       <div class="ai-line"></div>
       <div class="bubble">
-        ${text.replace(/</g, "&lt;")}
+        ${safeText}
         <div class="message-actions">
           <button class="action-btn" onclick="navigator.clipboard.writeText(this.closest('.bubble').innerText.split('\n')[0])"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button>
-          <button class="action-btn ${rating==='like'?'selected':''}" onclick="rateMessage(this, 'like')"><svg viewBox="0 0 24 24"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Zm0 0 5-8a3 3 0 0 1 2 3l-1 5h6a2 2 0 0 1 2 2l-2 7a3 3 0 0 1-3 2H7"/></svg></button>
-          <button class="action-btn ${rating==='dislike'?'selected':''}" onclick="rateMessage(this, 'dislike')"><svg viewBox="0 0 24 24"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Zm0 0 5 8a3 3 0 0 0 2-3l-1-5h6a2 2 0 0 0 2-2l-2-7a3 3 0 0 0-3-2H7"/></svg></button>
+          <button class="action-btn ${rating==='like'?'selected':''}" onclick="rateMessage(this, 'like', '${msgId}')"><svg viewBox="0 0 24 24"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Zm0 0 5-8a3 3 0 0 1 2 3l-1 5h6a2 2 0 0 1 2 2l-2 7a3 3 0 0 1-3 2H7"/></svg></button>
+          <button class="action-btn ${rating==='dislike'?'selected':''}" onclick="rateMessage(this, 'dislike', '${msgId}')"><svg viewBox="0 0 24 24"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Zm0 0 5 8a3 3 0 0 0 2-3l-1-5h6a2 2 0 0 0 2-2l-2-7a3 3 0 0 0-3-2H7"/></svg></button>
         </div>
       </div>`;
   }
@@ -545,8 +597,20 @@ function appendMessage(role, text, rating = null) {
   msgBox.scrollTop = msgBox.scrollHeight;
 }
 
+async function rateMessage(btn, type, msgId) {
+  if (!msgId || msgId === 'null') return;
+  const parent = btn.closest('.message-actions');
+  
+  // Update UI
+  parent.querySelectorAll('.action-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  
+  // Save to DB
+  await supabase.from('messages').update({ rating: type }).eq('id', msgId);
+}
+
 // ==========================================
-// 5. SENDING MESSAGES
+// 6. SEND MESSAGE & AI LOGIC
 // ==========================================
 $('#prompt').addEventListener('input', () => {
   const has = $('#prompt').value.trim().length > 0;
@@ -575,21 +639,24 @@ $('#composer').onsubmit = async (e) => {
   generating = true;
   appendMessage('user', text);
 
+  let newChatId = currentChatId;
+
   // 1. Create conversation if it doesn't exist
-  if (!currentChatId) {
+  if (!newChatId) {
     const { data, error } = await supabase.from('conversations').insert([{ 
       user_id: currentUser.id, 
       title: text.slice(0, 40) 
     }]).select().single();
     if (!error) {
-      currentChatId = data.id;
+      newChatId = data.id;
+      currentChatId = newChatId;
       fetchChats();
     }
   }
 
   // 2. Save user message to DB
   await supabase.from('messages').insert([{ 
-    conversation_id: currentChatId, 
+    conversation_id: newChatId, 
     role: 'user', 
     content: text 
   }]);
@@ -603,7 +670,7 @@ $('#composer').onsubmit = async (e) => {
   msgBox.append(thinkingRow);
   msgBox.scrollTop = msgBox.scrollHeight;
 
-  // 4. Call Backend API
+  // 4. Call Backend API (Railway -> Groq)
   try {
     const session = await supabase.auth.getSession();
     const token = session.data.session.access_token;
@@ -627,13 +694,15 @@ $('#composer').onsubmit = async (e) => {
     
     // 5. Save AI message to DB
     const { data: savedMsg } = await supabase.from('messages').insert([{ 
-      conversation_id: currentChatId, 
+      conversation_id: newChatId, 
       role: 'assistant', 
       content: aiData.reply 
     }]).select().single();
 
-    appendMessage('assistant', aiData.reply);
-    fetchChats(); // Update sorting
+    // Append with the correct msgId so Like/Dislike works
+    appendMessage('assistant', aiData.reply, null, savedMsg?.id);
+    
+    fetchChats(); // Refresh sort order
 
   } catch (err) {
     thinkingRow.remove();
@@ -644,36 +713,10 @@ $('#composer').onsubmit = async (e) => {
 };
 
 // ==========================================
-// 6. SETTINGS & NAVIGATION
+// 7. INITIALIZATION
 // ==========================================
-function openPage(id) { document.getElementById(id).classList.add('open'); }
-function closePage(id) { document.getElementById(id).classList.remove('open'); }
-
-document.addEventListener('click', (e) => {
-  const openBtn = e.target.closest('[data-open-page]');
-  if (openBtn) openPage(openBtn.dataset.openPage);
-  
-  const closeBtn = e.target.closest('[data-close-page]');
-  if (closeBtn) closePage(closeBtn.dataset.closePage);
-});
-
-$('#openSettings').onclick = () => openPage('settingsPage');
-
-$$('#themeChoices .choice').forEach(c => {
-  c.onclick = () => { currentTheme = c.dataset.theme; applyTheme(); };
-});
-
-$$('#uiLangChoices .choice').forEach(c => {
-  c.onclick = () => { currentLang = c.dataset.lang; applyLang(); };
-});
-
-$$('#aiLangChoices .choice').forEach(c => {
-  c.onclick = () => { currentAiLang = c.dataset.ailang; applyLang(); };
-});
-
-// Init
 applyLang();
 applyTheme();
 </script>
 </body>
-</html>
+          </html>
