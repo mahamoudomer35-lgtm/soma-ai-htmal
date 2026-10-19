@@ -5,29 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101010">
 <title>Soma AI — 0.1</title>
-<link rel="icon" type="image/jpeg" href="https://i.postimg.cc/wvdst8wj/1792054921249.jpg">
-<link rel="apple-touch-icon" href="https://i.postimg.cc/wvdst8wj/1792054921249.jpg">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Soma AI">
-<meta property="og:title" content="Soma AI — Your AI Assistant">
-<meta property="og:description" content="Chat with Soma AI.">
-<meta property="og:image" content="https://i.postimg.cc/wvdst8wj/1792054921249.jpg">
-<meta property="og:image:secure_url" content="https://i.postimg.cc/wvdst8wj/1792054921249.jpg">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Soma AI — Your AI Assistant">
-<meta name="twitter:description" content="Chat with Soma AI.">
-<meta name="twitter:image" content="https://i.postimg.cc/wvdst8wj/1792054921249.jpg">
-<!-- Supabase JS Client -->
+<!-- تحميل مكتبة سوبابيس بدون تأخير -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* CSS Variables for Light/Dark Theme */
 :root{
   color-scheme:dark;
   --bg:#101010;--surface:#171717;--surface2:#202020;--surface3:#292929;
   --text:#f5f5f5;--muted:#a1a1aa;--subtle:#777;
   --line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.15);
   --blue:#3987ff;--blue-hover:#2674ed;--blue-soft:rgba(57,135,255,.13);--blue-light:#7eb3ff;
-  --danger:#f87171;
   --shadow:0 22px 70px rgba(0,0,0,.42);
   --sidebar:280px;
   --user-bubble:#2a2a2a;
@@ -39,15 +25,14 @@ body.light{
   --text:#1a1a1a;--muted:#6b6b73;--subtle:#888;
   --line:rgba(0,0,0,.09);--line2:rgba(0,0,0,.15);
   --blue:#2677ee;--blue-hover:#1765d5;--blue-soft:rgba(38,119,238,.10);--blue-light:#2677ee;
-  --danger:#dc2626;
   --shadow:0 22px 70px rgba(0,0,0,.18);
   --user-bubble:#2677ee;
   --user-bubble-text:#ffffff;
 }
 *{box-sizing:border-box;transition:background-color .15s ease,color .15s ease,border-color .15s ease}
-html,body{height:100%;margin:0}
-body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
-button,input,textarea,select{font:inherit}
+html,body{height:100%;margin:0;overflow:hidden}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea,select{font:inherit; touch-action: manipulation;}
 button{color:inherit;cursor:pointer;transition:background-color .15s,color .15s,border-color .15s,transform .08s}
 button:active{transform:scale(.97)}
 [hidden]{display:none!important}
@@ -57,13 +42,8 @@ svg{stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-l
 .app{height:100dvh;display:flex;position:relative;background:var(--bg)}
 .sidebar{width:var(--sidebar);flex:0 0 var(--sidebar);background:var(--surface);display:flex;flex-direction:column;padding:13px 11px 0;z-index:20;border-right:1px solid var(--line);transition:transform .22s ease;overflow:hidden}
 .side-brandrow{display:flex;align-items:center;gap:9px;padding:3px 4px 14px;min-width:250px}
-.brand{font-size:19px;letter-spacing:-.7px;font-weight:760;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
-.brand-logo{width:29px;height:29px;flex:0 0 29px;object-fit:cover;border-radius:8px;display:block}
-.topbar .brand-logo{width:27px;height:27px;flex-basis:27px}
+.brand{font-size:19px;letter-spacing:-.7px;font-weight:760;white-space:nowrap}
 .brand .ai{color:var(--blue)}
-.profile-logo-large{width:54px;height:54px;object-fit:cover;border-radius:15px;display:block;border:1px solid var(--line2)}
-.profile-heading{display:flex;align-items:center;gap:13px;padding:14px;background:var(--surface);border-radius:14px;margin-bottom:12px}
-.profile-heading .txt{min-width:0;overflow-wrap:anywhere}
 .icon-btn{height:36px;width:36px;flex:0 0 36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--muted)}
 .icon-btn:hover{background:var(--surface3);color:var(--text)}
 .icon-btn svg{height:18px;width:18px}
@@ -126,17 +106,15 @@ body.ar .ai-line{margin-right:0;margin-left:14px}
 .composer textarea{flex:1;min-width:0;resize:none;max-height:180px;min-height:29px;padding:5px 0;outline:none;border:0;background:transparent;color:var(--text);font-size:15px;line-height:1.5}
 .composer textarea::placeholder{color:var(--muted)}
 .send-btn,.stop-btn{height:39px;width:39px;flex:0 0 39px;border:0;border-radius:13px;display:grid;place-items:center}
-.stop-btn{background:var(--surface3);color:var(--text)}
-.stop-btn svg{width:17px;height:17px}
 .send-btn{background:var(--surface3);color:var(--muted);cursor:not-allowed;opacity:.55}
 .send-btn.ready{background:var(--blue-light);color:#fff;cursor:pointer;opacity:1}
 .send-btn.ready:hover{background:var(--blue-hover)}
 .send-btn svg{width:19px;height:19px}
 
-/* Modals (Settings, Profile, Auth) */
-.fullpage{position:fixed;inset:0;background:var(--bg);z-index:60;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease}
+/* Full Page Modals */
+.fullpage{position:fixed;inset:0;background:var(--bg);z-index:60;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease; pointer-events: none;}
 body.ar .fullpage{transform:translateX(-100%)}
-.fullpage.open{transform:translateX(0)}
+.fullpage.open{transform:translateX(0); pointer-events: auto;}
 .fp-head{height:56px;flex:0 0 56px;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--bg)}
 .fp-back{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:11px;border:1px solid transparent;background:transparent;color:var(--text);cursor:pointer}
 .fp-back:hover{background:var(--surface2)}
@@ -182,13 +160,13 @@ body.ar .fullpage{transform:translateX(-100%)}
 .auth-btn:hover{background:var(--blue-hover)}
 .auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--muted)}
 .auth-switch span{color:var(--blue);cursor:pointer}
-.auth-error{color:var(--danger);font-size:12px;text-align:center;margin-bottom:10px;min-height:16px}
+.auth-error{color:#f87171;font-size:12px;text-align:center;margin-bottom:10px;min-height:16px}
 
 /* Mobile */
 @media(max-width:760px){
-  .sidebar{position:fixed;left:0;top:0;bottom:0;width:85vw;flex-basis:auto;transform:translateX(-105%);box-shadow:18px 0 50px rgba(0,0,0,.28);z-index:30}
-  body.ar .sidebar{left:auto;right:0;transform:translateX(105%);box-shadow:-18px 0 50px rgba(0,0,0,.28);border-right:0;border-left:1px solid var(--line)}
-  .sidebar.mobile-open{transform:translateX(0)}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:85vw;flex-basis:auto;transform:translateX(-105%);box-shadow:18px 0 50px rgba(0,0,0,.28);z-index:30; pointer-events: none;}
+  body.ar .sidebar{left:auto;right:0;transform:translateX(105%);box-shadow:-18px 0 50px rgba(0,0,0,.28);border-right:0;border-left:1px solid var(--line); pointer-events: none;}
+  .sidebar.mobile-open{transform:translateX(0); pointer-events: auto;}
   .shade{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:25;display:none}
   .shade.open{display:block}
   .messages{padding:15px 14px 155px}
@@ -201,8 +179,7 @@ body.ar .fullpage{transform:translateX(-100%)}
 
 <!-- Auth Modal -->
 <div class="auth-modal" id="authModal">
-  <div class="auth-card" style="position:relative">
-    <button type="button" id="closeAuthBtn" class="icon-btn" aria-label="Close login" title="Close" style="position:absolute;right:12px;top:12px">×</button>
+  <div class="auth-card">
     <h2 id="authTitle">Welcome to Soma AI</h2>
     <div class="auth-error" id="authError"></div>
     <form id="authForm">
@@ -231,7 +208,7 @@ body.ar .fullpage{transform:translateX(-100%)}
   <aside class="sidebar" id="sidebar">
     <div class="side-brandrow">
       <button class="icon-btn" id="sidebarToggle"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <div class="brand"><img class="brand-logo" src="https://i.postimg.cc/wvdst8wj/1792054921249.jpg" alt="Soma AI logo"><span>Soma <span class="ai">AI</span></span></div>
+      <div class="brand">Soma <span class="ai">AI</span></div>
     </div>
     <button class="nav-btn" id="newChatBtn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> <span id="txtNewChat">New chat</span></button>
     
@@ -245,8 +222,8 @@ body.ar .fullpage{transform:translateX(-100%)}
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 0 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 0 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 0 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
       </button>
       <button class="bottom-btn" id="openProfile" title="Profile">
-        <img id="sidebarProfileImg" src="https://i.postimg.cc/wvdst8wj/1792054921249.jpg" alt="Soma AI logo" style="display:block;">
-        <span class="avatar-letter" id="sidebarProfileInitial" hidden>G</span>
+        <img id="sidebarProfileImg" src="" style="display:none;">
+        <span class="avatar-letter" id="sidebarProfileInitial">G</span>
       </button>
     </div>
   </aside>
@@ -256,7 +233,7 @@ body.ar .fullpage{transform:translateX(-100%)}
   <main class="main">
     <header class="topbar">
       <button class="icon-btn" id="topMenu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <div class="brand"><img class="brand-logo" src="https://i.postimg.cc/wvdst8wj/1792054921249.jpg" alt="Soma AI logo"><span>Soma <span class="ai">AI</span></span></div>
+      <div class="brand">Soma <span class="ai">AI</span></div>
       <span class="topbar-spacer"></span>
       <button class="icon-btn" id="loginBtnTop" style="width:auto; padding:0 12px; font-size:13px;">Login</button>
     </header>
@@ -272,10 +249,7 @@ body.ar .fullpage{transform:translateX(-100%)}
     <div class="composer-wrap">
       <form class="composer" id="composer">
         <textarea id="prompt" rows="1" placeholder="Message Soma AI…"></textarea>
-        <button type="button" class="stop-btn" id="stopBtn" hidden aria-label="Stop generating" title="Stop generating">
-          <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
-        </button>
-        <button type="submit" class="send-btn" id="sendBtn" disabled aria-label="Send message" title="Send message">
+        <button type="submit" class="send-btn" id="sendBtn" disabled>
           <svg viewBox="0 0 24 24"><path d="M21 3 10.5 13.5"/><path d="m21 3-6.7 18-3.8-7.8L3 9.7 21 3Z"/></svg>
         </button>
       </form>
@@ -287,8 +261,7 @@ body.ar .fullpage{transform:translateX(-100%)}
 <section class="fullpage" id="settingsPage">
   <div class="fp-head">
     <button class="fp-back" data-close-page="settingsPage"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="fp-title">Settings</div>
-    <span class="spacer"></span>
+    <div class="fp-title">Settings</div><span class="spacer"></span>
   </div>
   <div class="fp-body">
     <div class="fp-section">
@@ -366,480 +339,393 @@ body.ar .fullpage{transform:translateX(-100%)}
 <!-- Profile Page -->
 <section class="fullpage" id="profilePage">
   <div class="fp-head">
-    <button class="fp-back" data-close-page="profilePage" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button class="fp-back" data-close-page="profilePage"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="fp-title">Profile</div><span class="spacer"></span>
   </div>
-  <div class="fp-body">
-    <div class="fp-section">
-      <div class="fp-section-label">Account details</div>
-      <div class="profile-heading"><img class="profile-logo-large" src="https://i.postimg.cc/wvdst8wj/1792054921249.jpg" alt="Soma AI logo"><div class="txt"><div class="ttl" id="profileName">Guest</div><div class="sub" id="profileEmail">Not signed in</div></div></div>
-      <button class="fp-item" id="profileLogoutBtn" type="button" style="width:100%;text-align:left;color:var(--danger)"><span class="ico">↪</span><div class="txt"><div class="ttl">Log out</div></div></button>
-    </div>
+  <div class="fp-body" style="display:flex;flex-direction:column;align-items:center;padding-top:40px;">
+    <div style="width:88px;height:88px;border-radius:50%;background:var(--blue-soft);color:var(--blue);font-size:32px;font-weight:700;display:grid;place-items:center;margin-bottom:16px;" id="profileBigAvatar">G</div>
+    <div style="font-size:20px;font-weight:600;" id="profileBigName">Guest</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:4px;" id="profileBigEmail">not signed in</div>
   </div>
 </section>
 
 <script>
-// ==========================================
-// 1. CONFIGURATION & INITIALIZATION
-// Keep these names stable: backend/database setup may depend on them.
-// ==========================================
-const SUPABASE_URL = "https://xrhqfnvhktupekxffzuv.supabase.co";
-const SUPABASE_KEY = "sb_publishable_lGcUO42DonOuwGMOWIZGgA_WXIjr95-";
-const RAILWAY_URL = "https://soma-ai-backend-production-4457.up.railway.app";
-
-if (!window.supabase?.createClient) {
-  document.body.innerHTML = '<main style="font-family:system-ui;padding:24px">Soma AI could not load the Supabase client. Check your internet connection and reload this page.</main>';
-  throw new Error('Supabase JS client did not load');
-}
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-
-let currentUser = null;
-let chats = [];
-let currentChatId = null;
-let generating = false;
-let abortController = null;
-let currentLang = localStorage.getItem('soma_lang') || 'en';
-let currentAiLang = localStorage.getItem('soma_ailang') || 'en';
-let currentTheme = localStorage.getItem('soma_theme') || 'dark';
-let isSignUp = false;
-let feedbackTarget = null;
-let suppressAbortMessage = false;
-
-const I18N = {
-  en: { newChat: 'New chat', recents: 'Recents', hello: 'Hello, how can I help you today?', hint: "Ask anything, and I'll do my best to help." },
-  ar: { newChat: 'محادثة جديدة', recents: 'الأخيرة', hello: 'مرحبًا، كيف يمكنني مساعدتك اليوم؟', hint: 'اسأل عن أي شيء، وسأبذل قصارى جهدي للمساعدة.' },
-  so: { newChat: 'Sheeko cusub', recents: 'Kuwii u dambeeyay', hello: 'Salaan, sideen maanta kuu caawin karaa?', hint: 'Wax walba weydii, waxaan isku dayi doonaa inaan ku caawiyo.' }
-};
-
-function safeText(value) { return String(value ?? ''); }
-function languageName(lang) { return lang === 'ar' ? 'العربية' : lang === 'so' ? 'Soomaali' : 'English'; }
-function applyLang() {
-  const t = I18N[currentLang] || I18N.en;
-  document.documentElement.lang = currentLang;
-  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-  document.body.classList.toggle('ar', currentLang === 'ar');
-  $('#txtNewChat').textContent = t.newChat;
-  $('#txtRecents').textContent = t.recents;
-  $('#txtHello').textContent = t.hello;
-  $('#txtWelcomeHint').textContent = t.hint;
-  $('#uiLangCurrent').textContent = languageName(currentLang);
-  $('#aiLangCurrent').textContent = languageName(currentAiLang);
-  $$('#uiLangChoices .choice').forEach(c => c.classList.toggle('selected', c.dataset.lang === currentLang));
-  $$('#aiLangChoices .choice').forEach(c => c.classList.toggle('selected', c.dataset.ailang === currentAiLang));
-  localStorage.setItem('soma_lang', currentLang);
-  localStorage.setItem('soma_ailang', currentAiLang);
-}
-function applyTheme() {
-  document.body.classList.toggle('light', currentTheme === 'light');
-  $('#themeCurrent').textContent = currentTheme === 'light' ? 'Light' : 'Dark';
-  $$('#themeChoices .choice').forEach(c => c.classList.toggle('selected', c.dataset.theme === currentTheme));
-  localStorage.setItem('soma_theme', currentTheme);
-}
-
-// ==========================================
-// 2. AUTHENTICATION
-// ==========================================
-function showAuth(open = true) {
-  $('#authModal').classList.toggle('open', open);
-  if (open) setTimeout(() => $('#authEmail').focus(), 50);
-}
-function setAuthMode(signUp) {
-  isSignUp = signUp;
-  $('#authTitle').textContent = signUp ? 'Create an account' : 'Welcome back';
-  $('#authSubmitBtn').textContent = signUp ? 'Sign Up' : 'Login';
-  $('#nameGroup').style.display = signUp ? 'block' : 'none';
-  $('#authName').required = signUp;
-  $('#authSwitchLink').textContent = signUp ? 'Already have an account? Login' : "Don't have an account? Sign up";
-  $('#authError').textContent = '';
-}
-$('#loginBtnTop').addEventListener('click', () => showAuth(true));
-$('#closeAuthBtn').addEventListener('click', () => showAuth(false));
-$('#authModal').addEventListener('click', e => { if (e.target === $('#authModal')) showAuth(false); });
-$('#authSwitchLink').addEventListener('click', () => setAuthMode(!isSignUp));
-
-$('#authForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const email = $('#authEmail').value.trim();
-  const password = $('#authPassword').value;
-  const name = $('#authName').value.trim();
-  const button = $('#authSubmitBtn');
-  button.disabled = true;
-  $('#authError').textContent = '';
-  try {
-    if (isSignUp) {
-      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
-      if (error) throw error;
-      if (!data.session) {
-        setAuthMode(false);
-        $('#authError').textContent = 'Account created. Check your email to confirm it, then log in.';
-      } else {
-        showAuth(false);
-      }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      showAuth(false);
-    }
-  } catch (err) {
-    $('#authError').textContent = safeText(err.message || 'Authentication failed. Please try again.');
-  } finally {
-    button.disabled = false;
-  }
-});
-
-async function logOut() {
-  try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    closePage('settingsPage');
-    closePage('profilePage');
-  } catch (err) {
-    alert('Could not log out: ' + safeText(err.message));
-  }
-}
-$('#logoutBtn').addEventListener('click', logOut);
-$('#profileLogoutBtn').addEventListener('click', logOut);
-
-supabase.auth.onAuthStateChange((_event, session) => {
-  currentUser = session?.user || null;
-  if (currentUser) {
-    $('#loginBtnTop').style.display = 'none';
-    $('#openProfile').style.display = 'flex';
-    const name = currentUser.user_metadata?.full_name || currentUser.email || 'User';
-    $('#sidebarProfileInitial').textContent = name.charAt(0).toUpperCase();
-    $('#profileName').textContent = name;
-    $('#profileEmail').textContent = currentUser.email || '';
-    fetchChats().catch(err => console.error('Could not load chats:', err));
-  } else {
-    $('#loginBtnTop').style.display = '';
-    $('#openProfile').style.display = 'none';
-    $('#profileName').textContent = 'Guest';
-    $('#profileEmail').textContent = 'Not signed in';
-    chats = [];
-    currentChatId = null;
-    renderHistory();
-    newChat();
-  }
-});
-
-// ==========================================
-// 3. CHAT HISTORY & RENDERING
-// ==========================================
-async function fetchChats() {
-  if (!currentUser) return;
-  const { data, error } = await supabase
-    .from('conversations')
-    .select('*, messages(*)')
-    .order('updated_at', { ascending: false });
-  if (error) throw error;
-  chats = (data || []).map(c => ({ ...c, messages: Array.isArray(c.messages) ? c.messages : [] }));
-  renderHistory();
-}
-function renderHistory() {
-  const host = $('#historyList');
-  host.replaceChildren();
-  if (!chats.length) {
-    const empty = document.createElement('div');
-    empty.style.cssText = 'padding:10px;font-size:12px;color:var(--muted)';
-    empty.textContent = 'No conversations yet.';
-    host.append(empty);
+// حماية الكود: لا يبدأ العمل إلا بعد تحميل الصفحة بالكامل والمكتبات
+document.addEventListener("DOMContentLoaded", function() {
+  if (!window.supabase) {
+    alert("Error: Supabase library failed to load. Please check your internet or refresh the page.");
     return;
   }
-  chats.forEach(c => {
-    const el = document.createElement('button');
-    el.type = 'button';
-    el.className = 'history-item' + (String(c.id) === String(currentChatId) ? ' active' : '');
-    el.style.width = '100%';
-    const title = document.createElement('span');
-    title.className = 'history-title';
-    title.textContent = c.title || 'New chat';
-    el.append(title);
-    el.addEventListener('click', () => { loadChat(c); closeSidebar(); });
-    host.append(el);
+
+  // ==========================================
+  // CONFIGURATION
+  // ==========================================
+  const SUPABASE_URL = "https://xrhqfnvhktupekxffzuv.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_lGcUO42DonOuwGMOWIZGgA_WXIjr95-";
+  const RAILWAY_URL = "https://soma-ai-backend-production-4457.up.railway.app"; 
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+
+  let currentUser = null;
+  let chats = [];
+  let currentChatId = null;
+  let generating = false;
+  let currentLang = localStorage.getItem('soma_lang') || 'en';
+  let currentAiLang = localStorage.getItem('soma_ailang') || 'en';
+  let currentTheme = localStorage.getItem('soma_theme') || 'dark';
+
+  // ==========================================
+  // TRANSLATIONS & UI
+  // ==========================================
+  const I18N = {
+    en: { newChat: "New chat", recents: "Recents", hello: "Hello, how can I help you today?", hint: "Ask anything, and I'll do my best to help." },
+    ar: { newChat: "محادثة جديدة", recents: "الأخيرة", hello: "مرحبًا، كيف يمكنني مساعدتك اليوم؟", hint: "اسأل عن أي شيء، وسأبذل قصارى جهدي للمساعدة." },
+    so: { newChat: "Sheeko cusub", recents: "Kuwii u dambeeyay", hello: "Salaan, maanta sideen kuu caawin karaa?", hint: "Wax walba weydii, waanan ku caawin doonaa." }
+  };
+
+  window.applyLang = function() {
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.body.classList.toggle('ar', currentLang === 'ar');
+    
+    const t = I18N[currentLang];
+    $('#txtNewChat').textContent = t.newChat;
+    $('#txtRecents').textContent = t.recents;
+    $('#txtHello').textContent = t.hello;
+    $('#txtWelcomeHint').textContent = t.hint;
+    
+    $('#uiLangCurrent').textContent = currentLang === 'ar' ? 'العربية' : currentLang === 'so' ? 'Soomaali' : 'English';
+    $('#aiLangCurrent').textContent = currentAiLang === 'ar' ? 'العربية' : currentAiLang === 'so' ? 'Soomaali' : 'English';
+    
+    $$('#uiLangChoices .choice').forEach(c => c.classList.toggle('selected', c.dataset.lang === currentLang));
+    $$('#aiLangChoices .choice').forEach(c => c.classList.toggle('selected', c.dataset.ailang === currentAiLang));
+    localStorage.setItem('soma_lang', currentLang);
+    localStorage.setItem('soma_ailang', currentAiLang);
+  };
+
+  window.applyTheme = function() {
+    document.body.classList.toggle('light', currentTheme === 'light');
+    $('#themeCurrent').textContent = currentTheme === 'light' ? 'Light' : 'Dark';
+    $$('#themeChoices .choice').forEach(c => c.classList.toggle('selected', c.dataset.theme === currentTheme));
+    localStorage.setItem('soma_theme', currentTheme);
+  };
+
+  window.openPage = function(id) { document.getElementById(id).classList.add('open'); };
+  window.closePage = function(id) { document.getElementById(id).classList.remove('open'); };
+
+  document.addEventListener('click', (e) => {
+    const openBtn = e.target.closest('[data-open-page]');
+    if (openBtn) window.openPage(openBtn.dataset.openPage);
+    const closeBtn = e.target.closest('[data-close-page]');
+    if (closeBtn) window.closePage(closeBtn.dataset.closePage);
   });
-}
-function loadChat(chat) {
-  currentChatId = chat.id;
-  renderHistory();
-  $('#welcome').hidden = true;
-  const msgBox = $('#messages');
-  msgBox.hidden = false;
-  msgBox.replaceChildren();
-  const sorted = [...(chat.messages || [])].sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
-  sorted.forEach(m => appendMessage(m.role, m.content, m.rating || null, m.id || null));
-  msgBox.scrollTop = msgBox.scrollHeight;
-}
-function newChat() {
-  if (generating) { suppressAbortMessage = true; stopGeneration(); }
-  currentChatId = null;
-  renderHistory();
-  $('#messages').hidden = true;
-  $('#messages').replaceChildren();
-  $('#welcome').hidden = false;
-  $('#prompt').value = '';
-  updateComposer();
-  $('#prompt').focus({ preventScroll: true });
-}
-function appendMessage(role, text, rating = null, messageId = null) {
-  const msgBox = $('#messages');
-  const row = document.createElement('article');
-  row.className = 'message ' + (role === 'user' ? 'user' : 'assistant');
-  if (messageId) row.dataset.messageId = messageId;
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.textContent = safeText(text);
-  if (role === 'user') {
-    const wrap = document.createElement('div');
-    wrap.className = 'user-bubble-wrap';
-    wrap.append(bubble);
-    row.append(wrap);
-  } else {
-    const line = document.createElement('div');
-    line.className = 'ai-line';
-    const actions = document.createElement('div');
-    actions.className = 'message-actions';
-    actions.append(
-      makeAction('Copy response', '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>', async () => {
-        try { await navigator.clipboard.writeText(safeText(text)); }
-        catch { fallbackCopy(safeText(text)); }
-      }),
-      makeAction('Like response', '<path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Zm0 0 5-8a3 3 0 0 1 2 3l-1 5h6a2 2 0 0 1 2 2l-2 7a3 3 0 0 1-3 2H7"/>', () => rateMessage(row, 'like'), rating === 'like'),
-      makeAction('Dislike response', '<path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Zm0 0 5 8a3 3 0 0 0 2-3l-1-5h6a2 2 0 0 0 2-2l-2-7a3 3 0 0 0-3-2H7"/>', () => rateMessage(row, 'dislike'), rating === 'dislike'),
-      makeAction('Share response', '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4.2M8.6 13.4l6.8 4.2"/>', async () => {
-        try {
-          if (navigator.share) await navigator.share({ title: 'Soma AI response', text: safeText(text) });
-          else { await navigator.clipboard.writeText(safeText(text)); alert('Response copied. You can now share it.'); }
-        } catch (err) { if (err.name !== 'AbortError') fallbackCopy(safeText(text)); }
-      })
-    );
-    bubble.append(actions);
-    row.append(line, bubble);
-  }
-  msgBox.append(row);
-  msgBox.scrollTop = msgBox.scrollHeight;
-  return row;
-}
-function makeAction(label, path, onClick, selected = false) {
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'action-btn' + (selected ? ' selected' : '');
-  btn.title = label;
-  btn.setAttribute('aria-label', label);
-  btn.innerHTML = '<svg viewBox="0 0 24 24">' + path + '</svg>';
-  btn.addEventListener('click', onClick);
-  return btn;
-}
-function fallbackCopy(text) {
-  const area = document.createElement('textarea');
-  area.value = text;
-  area.style.position = 'fixed'; area.style.opacity = '0';
-  document.body.append(area); area.select();
-  try { document.execCommand('copy'); } catch (_) {}
-  area.remove();
-}
-async function rateMessage(row, rating) {
-  const likeBtn = row.querySelectorAll('.action-btn')[1];
-  const dislikeBtn = row.querySelectorAll('.action-btn')[2];
-  const alreadySelected = (rating === 'like' ? likeBtn : dislikeBtn).classList.contains('selected');
-  likeBtn?.classList.remove('selected');
-  dislikeBtn?.classList.remove('selected');
-  if (alreadySelected) return;
-  (rating === 'like' ? likeBtn : dislikeBtn)?.classList.add('selected');
-  if (rating === 'dislike') {
-    feedbackTarget = { row, messageId: row.dataset.messageId || null, rating };
-    openFeedback();
-  }
-  // Rating is reflected immediately in the UI. The feedback dialog saves detailed feedback.
-}
 
-// ==========================================
-// 4. SEND / STOP MESSAGE
-// ==========================================
-function updateComposer() {
-  const has = $('#prompt').value.trim().length > 0;
-  $('#sendBtn').classList.toggle('ready', has && !generating);
-  $('#sendBtn').disabled = !has || generating;
-  $('#stopBtn').hidden = !generating;
-}
-$('#prompt').addEventListener('input', () => {
-  const prompt = $('#prompt');
-  prompt.style.height = 'auto';
-  prompt.style.height = Math.min(prompt.scrollHeight, 180) + 'px';
-  updateComposer();
-});
-$('#prompt').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
-    e.preventDefault();
-    if (!$('#sendBtn').disabled) $('#composer').requestSubmit();
-  }
-});
-$('#stopBtn').addEventListener('click', stopGeneration);
-function stopGeneration() {
-  if (abortController) abortController.abort();
-}
-$('#composer').addEventListener('submit', async e => {
-  e.preventDefault();
-  if (generating) return;
-  if (!currentUser) { showAuth(true); return; }
-  const text = $('#prompt').value.trim();
-  if (!text) return;
-  $('#prompt').value = '';
-  $('#prompt').style.height = 'auto';
-  $('#welcome').hidden = true;
-  $('#messages').hidden = false;
-  appendMessage('user', text);
-  generating = true;
-  abortController = new AbortController();
-  updateComposer();
-  const thinkingRow = document.createElement('article');
-  thinkingRow.className = 'message assistant';
-  thinkingRow.id = 'thinking-row';
-  thinkingRow.innerHTML = '<div class="ai-line"></div><div class="bubble"><span class="thinking-dot" aria-label="Soma AI is thinking"></span></div>';
-  $('#messages').append(thinkingRow);
-  $('#content').scrollTop = $('#content').scrollHeight;
-  try {
-    // Create a database conversation first, so both messages have a valid parent.
-    if (!currentChatId) {
-      const { data, error } = await supabase.from('conversations').insert({
-        user_id: currentUser.id,
-        title: text.slice(0, 40) || 'New chat'
-      }).select().single();
-      if (error) throw new Error('Could not create conversation: ' + error.message);
-      currentChatId = data.id;
-    }
-    const { error: userSaveError } = await supabase.from('messages').insert({
-      conversation_id: currentChatId, role: 'user', content: text
-    });
-    if (userSaveError) throw new Error('Could not save your message: ' + userSaveError.message);
+  $('#openSettings').onclick = () => window.openPage('settingsPage');
 
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError) throw sessionError;
-    const token = sessionData?.session?.access_token;
-    if (!token) throw new Error('Your session has expired. Please log in again.');
-    const baseUrl = RAILWAY_URL.replace(/\/+$/, '');
-    const res = await fetch(`${baseUrl}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ message: text, language: currentAiLang }),
-      signal: abortController.signal
-    });
-    let aiData = {};
-    try { aiData = await res.json(); } catch (_) {}
-    if (!res.ok) throw new Error(aiData.detail || aiData.error || `Server error (${res.status})`);
-    if (typeof aiData.reply !== 'string' || !aiData.reply.trim()) throw new Error('The AI server returned an empty or invalid reply.');
-    thinkingRow.remove();
-    const { data: savedMsg, error: aiSaveError } = await supabase.from('messages').insert({
-      conversation_id: currentChatId, role: 'assistant', content: aiData.reply
-    }).select().single();
-    if (aiSaveError) console.error('AI reply could not be saved:', aiSaveError.message);
-    appendMessage('assistant', aiData.reply, null, savedMsg?.id || null);
-    await fetchChats();
-  } catch (err) {
-    thinkingRow.remove();
-    if (err.name === 'AbortError') {
-      if (!suppressAbortMessage) appendMessage('assistant', 'Generation stopped.');
+  $$('#themeChoices .choice').forEach(c => {
+    c.onclick = () => { currentTheme = c.dataset.theme; window.applyTheme(); };
+  });
+  $$('#uiLangChoices .choice').forEach(c => {
+    c.onclick = () => { currentLang = c.dataset.lang; window.applyLang(); };
+  });
+  $$('#aiLangChoices .choice').forEach(c => {
+    c.onclick = () => { currentAiLang = c.dataset.ailang; window.applyLang(); };
+  });
+
+  // Sidebar Mobile Toggle
+  window.toggleSidebar = function() {
+    const isOpen = $('#sidebar').classList.contains('mobile-open');
+    if (isOpen) {
+      $('#sidebar').classList.remove('mobile-open');
+      $('#sidebarShade').classList.remove('open');
     } else {
-      console.error('Chat request failed:', err);
-      appendMessage('assistant', '⚠️ ' + safeText(err.message || 'Something went wrong. Please try again.'));
+      $('#sidebar').classList.add('mobile-open');
+      $('#sidebarShade').classList.add('open');
     }
-  } finally {
-    generating = false;
-    abortController = null;
-    suppressAbortMessage = false;
-    updateComposer();
-    $('#prompt').focus({ preventScroll: true });
+  };
+  $('#sidebarToggle').onclick = window.toggleSidebar;
+  $('#topMenu').onclick = window.toggleSidebar;
+  $('#sidebarShade').onclick = window.toggleSidebar;
+
+  // ==========================================
+  // AUTHENTICATION
+  // ==========================================
+  let isSignUp = false;
+  $('#loginBtnTop').onclick = () => { $('#authModal').classList.add('open'); };
+
+  $('#authSwitchLink').onclick = () => {
+    isSignUp = !isSignUp;
+    $('#authTitle').textContent = isSignUp ? "Create an account" : "Welcome back";
+    $('#authSubmitBtn').textContent = isSignUp ? "Sign Up" : "Login";
+    $('#nameGroup').style.display = isSignUp ? "block" : "none";
+    $('#authSwitchLink').textContent = isSignUp ? "Already have an account? Login" : "Don't have an account? Sign up";
+    $('#authError').textContent = "";
+  };
+
+  $('#authForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = $('#authEmail').value;
+    const password = $('#authPassword').value;
+    const name = $('#authName').value;
+    
+    $('#authSubmitBtn').disabled = true;
+    $('#authError').textContent = "";
+    
+    try {
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({ 
+          email, password,
+          options: { data: { full_name: name } }
+        });
+        if (error) throw error;
+        alert("Account created! You can now log in.");
+        isSignUp = false;
+        $('#authSwitchLink').click();
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+      }
+      $('#authModal').classList.remove('open');
+    } catch (err) {
+      $('#authError').textContent = err.message;
+    } finally {
+      $('#authSubmitBtn').disabled = false;
+    }
+  };
+
+  $('#logoutBtn').onclick = async () => {
+    await supabase.auth.signOut();
+    window.closePage('settingsPage');
+  };
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+      currentUser = session.user;
+      $('#loginBtnTop').style.display = 'none';
+      $('#openProfile').style.display = 'flex';
+      
+      const name = currentUser.user_metadata?.full_name || currentUser.email;
+      $('#sidebarProfileInitial').textContent = name.charAt(0).toUpperCase();
+      $('#profileBigAvatar').textContent = name.charAt(0).toUpperCase();
+      $('#profileBigName').textContent = name;
+      $('#profileBigEmail').textContent = currentUser.email;
+
+      fetchChats();
+    } else {
+      currentUser = null;
+      $('#loginBtnTop').style.display = 'block';
+      $('#openProfile').style.display = 'none';
+      chats = [];
+      renderHistory();
+      window.newChat();
+    }
+  });
+
+  $('#openProfile').onclick = () => window.openPage('profilePage');
+
+  // ==========================================
+  // DATABASE & HISTORY
+  // ==========================================
+  async function fetchChats() {
+    if (!currentUser) return;
+    try {
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*, messages(*)')
+        .order('updated_at', { ascending: false });
+        
+      if (!error && data) {
+        chats = data;
+        renderHistory();
+      }
+    } catch(e) { console.error(e); }
   }
-});
 
-// ==========================================
-// 5. SETTINGS, NAVIGATION & SIDEBAR
-// ==========================================
-function openPage(id) { const page = document.getElementById(id); if (page) page.classList.add('open'); }
-function closePage(id) { const page = document.getElementById(id); if (page) page.classList.remove('open'); }
-document.addEventListener('click', e => {
-  const openBtn = e.target.closest('[data-open-page]');
-  if (openBtn) openPage(openBtn.dataset.openPage);
-  const closeBtn = e.target.closest('[data-close-page]');
-  if (closeBtn) closePage(closeBtn.dataset.closePage);
-});
-$('#openSettings').addEventListener('click', () => openPage('settingsPage'));
-$('#openProfile').addEventListener('click', () => openPage('profilePage'));
-$$('#themeChoices .choice').forEach(c => c.addEventListener('click', () => { currentTheme = c.dataset.theme; applyTheme(); }));
-$$('#uiLangChoices .choice').forEach(c => c.addEventListener('click', () => { currentLang = c.dataset.lang; applyLang(); }));
-$$('#aiLangChoices .choice').forEach(c => c.addEventListener('click', () => { currentAiLang = c.dataset.ailang; applyLang(); }));
-
-function openSidebar() {
-  $('#sidebar').classList.add('mobile-open');
-  $('#sidebarShade').classList.add('open');
-}
-function closeSidebar() {
-  $('#sidebar').classList.remove('mobile-open');
-  $('#sidebarShade').classList.remove('open');
-}
-$('#topMenu').addEventListener('click', openSidebar);
-$('#sidebarToggle').addEventListener('click', closeSidebar);
-$('#sidebarShade').addEventListener('click', closeSidebar);
-$('#newChatBtn').addEventListener('click', () => { newChat(); closeSidebar(); });
-
-// ==========================================
-// 6. FEEDBACK DIALOG
-// ==========================================
-function openFeedback() {
-  let modal = $('#feedbackModal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'feedbackModal';
-    modal.className = 'auth-modal open';
-    modal.innerHTML = `<div class="auth-card" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
-      <button type="button" id="closeFeedbackBtn" class="icon-btn" aria-label="Close feedback" style="float:right">×</button>
-      <h2 id="feedbackTitle">Share feedback</h2>
-      <p style="font-size:13px;color:var(--muted);line-height:1.5">What went wrong with this response?</p>
-      <form id="feedbackForm">
-        <div class="auth-field"><label for="feedbackReason">Reason</label><select id="feedbackReason" required style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line2);background:var(--bg);color:var(--text)"><option value="">Choose a reason</option><option value="incorrect">Incorrect answer</option><option value="not_helpful">Not helpful</option><option value="unsafe">Unsafe or inappropriate</option><option value="poor_language">Language or writing issue</option><option value="other">Other</option></select></div>
-        <div class="auth-field"><label for="feedbackDetails">Additional details (optional)</label><textarea id="feedbackDetails" rows="3" style="width:100%;resize:vertical;padding:12px;border-radius:10px;border:1px solid var(--line2);background:var(--bg);color:var(--text)"></textarea></div>
-        <div class="auth-error" id="feedbackError"></div><button class="auth-btn" type="submit" id="feedbackSubmitBtn">Submit feedback</button>
-      </form></div>`;
-    document.body.append(modal);
-    $('#closeFeedbackBtn').addEventListener('click', closeFeedback);
-    modal.addEventListener('click', e => { if (e.target === modal) closeFeedback(); });
-    $('#feedbackForm').addEventListener('submit', submitFeedback);
-  } else {
-    modal.classList.add('open');
-    $('#feedbackError').textContent = '';
-  }
-}
-function closeFeedback() { $('#feedbackModal')?.classList.remove('open'); }
-async function submitFeedback(e) {
-  e.preventDefault();
-  const reason = $('#feedbackReason').value;
-  const details = $('#feedbackDetails').value.trim();
-  const btn = $('#feedbackSubmitBtn');
-  btn.disabled = true;
-  $('#feedbackError').textContent = '';
-  try {
-    // This expects the feedback table columns: user_id, message_id, rating, reason, details.
-    // If your schema uses different names, align this insert with schema.sql.
-    const { error } = await supabase.from('feedback').insert({
-      user_id: currentUser?.id || null,
-      message_id: feedbackTarget?.messageId || null,
-      rating: 'dislike', reason, details
+  function renderHistory() {
+    const host = $('#historyList');
+    host.innerHTML = '';
+    if (chats.length === 0) {
+      host.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted)">No conversations yet.</div>';
+      return;
+    }
+    chats.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'history-item' + (c.id === currentChatId ? ' active' : '');
+      el.innerHTML = `<span class="history-title">${c.title}</span>`;
+      el.onclick = () => loadChat(c);
+      host.append(el);
     });
-    if (error) throw error;
-    closeFeedback();
-  } catch (err) {
-    $('#feedbackError').textContent = 'Feedback could not be saved: ' + safeText(err.message || 'Please try again.');
-  } finally {
-    btn.disabled = false;
   }
-}
 
-// Init
-applyLang();
-applyTheme();
-updateComposer();
-setAuthMode(false);
+  window.loadChat = function(chat) {
+    currentChatId = chat.id;
+    renderHistory();
+    $('#welcome').hidden = true;
+    const msgBox = $('#messages');
+    msgBox.hidden = false;
+    msgBox.innerHTML = '';
+    
+    const sorted = [...chat.messages].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+    sorted.forEach(m => appendMessage(m.role, m.content, m.rating, m.id));
+    msgBox.scrollTop = msgBox.scrollHeight;
+    
+    if(window.innerWidth <= 760 && $('#sidebar').classList.contains('mobile-open')) window.toggleSidebar();
+  };
+
+  window.newChat = function() {
+    currentChatId = null;
+    renderHistory();
+    $('#messages').hidden = true;
+    $('#messages').innerHTML = '';
+    $('#welcome').hidden = false;
+    $('#prompt').value = '';
+    if(window.innerWidth <= 760 && $('#sidebar').classList.contains('mobile-open')) window.toggleSidebar();
+  };
+  $('#newChatBtn').onclick = window.newChat;
+
+  // ==========================================
+  // MESSAGES UI
+  // ==========================================
+  window.appendMessage = function(role, text, rating = null, msgId = null) {
+    const msgBox = $('#messages');
+    const row = document.createElement('article');
+    row.className = 'message ' + role;
+    if (msgId) row.dataset.id = msgId;
+    
+    const safeText = text.replace(/</g, "&lt;");
+    
+    if (role === 'user') {
+      row.innerHTML = `<div class="user-bubble-wrap"><div class="bubble">${safeText}</div></div>`;
+    } else {
+      row.innerHTML = `
+        <div class="ai-line"></div>
+        <div class="bubble">
+          ${safeText}
+          <div class="message-actions">
+            <button type="button" class="action-btn" onclick="navigator.clipboard.writeText(this.closest('.bubble').innerText.split('\n')[0])"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button>
+            <button type="button" class="action-btn ${rating==='like'?'selected':''}" onclick="rateMessage(this, 'like', '${msgId}')"><svg viewBox="0 0 24 24"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Zm0 0 5-8a3 3 0 0 1 2 3l-1 5h6a2 2 0 0 1 2 2l-2 7a3 3 0 0 1-3 2H7"/></svg></button>
+            <button type="button" class="action-btn ${rating==='dislike'?'selected':''}" onclick="rateMessage(this, 'dislike', '${msgId}')"><svg viewBox="0 0 24 24"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Zm0 0 5 8a3 3 0 0 0 2-3l-1-5h6a2 2 0 0 0 2-2l-2-7a3 3 0 0 0-3-2H7"/></svg></button>
+          </div>
+        </div>`;
+    }
+    msgBox.append(row);
+    msgBox.scrollTop = msgBox.scrollHeight;
+  };
+
+  window.rateMessage = async function(btn, type, msgId) {
+    if (!msgId || msgId === 'null') return;
+    const parent = btn.closest('.message-actions');
+    
+    parent.querySelectorAll('.action-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    
+    try {
+      await supabase.from('messages').update({ rating: type }).eq('id', msgId);
+    } catch(e) { console.error(e); }
+  };
+
+  // ==========================================
+  // SEND MESSAGE & AI LOGIC
+  // ==========================================
+  $('#prompt').addEventListener('input', () => {
+    const has = $('#prompt').value.trim().length > 0;
+    $('#sendBtn').classList.toggle('ready', has);
+    $('#sendBtn').disabled = !has;
+  });
+
+  $('#composer').onsubmit = async (e) => {
+    e.preventDefault();
+    if (generating) return;
+    
+    if (!currentUser) {
+      $('#authModal').classList.add('open');
+      return;
+    }
+
+    const text = $('#prompt').value.trim();
+    if (!text) return;
+
+    $('#prompt').value = '';
+    $('#sendBtn').classList.remove('ready');
+    $('#sendBtn').disabled = true;
+    $('#welcome').hidden = true;
+    $('#messages').hidden = false;
+
+    generating = true;
+    window.appendMessage('user', text);
+
+    let newChatId = currentChatId;
+
+    if (!newChatId) {
+      const { data, error } = await supabase.from('conversations').insert([{ 
+        user_id: currentUser.id, 
+        title: text.slice(0, 40) 
+      }]).select().single();
+      if (!error) {
+        newChatId = data.id;
+        currentChatId = newChatId;
+        fetchChats();
+      }
+    }
+
+    await supabase.from('messages').insert([{ 
+      conversation_id: newChatId, 
+      role: 'user', 
+      content: text 
+    }]);
+
+    const msgBox = $('#messages');
+    const thinkingRow = document.createElement('article');
+    thinkingRow.className = 'message assistant';
+    thinkingRow.id = 'thinking-row';
+    thinkingRow.innerHTML = `<div class="ai-line"></div><div class="bubble"><span class="thinking-dot"></span></div>`;
+    msgBox.append(thinkingRow);
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session.access_token;
+
+      const res = await fetch(`${RAILWAY_URL}/api/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ message: text, language: currentAiLang })
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.detail || "Server error");
+      }
+
+      const aiData = await res.json();
+      thinkingRow.remove();
+      
+      const { data: savedMsg } = await supabase.from('messages').insert([{ 
+        conversation_id: newChatId, 
+        role: 'assistant', 
+        content: aiData.reply 
+      }]).select().single();
+
+      window.appendMessage('assistant', aiData.reply, null, savedMsg?.id);
+      fetchChats();
+
+    } catch (err) {
+      thinkingRow.remove();
+      window.appendMessage('assistant', "⚠️ Error: " + err.message);
+    } finally {
+      generating = false;
+    }
+  };
+
+  // INITIALIZATION
+  window.applyLang();
+  window.applyTheme();
+});
 </script>
 </body>
 </html>
